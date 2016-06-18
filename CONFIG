@@ -1,0 +1,11 @@
+#
+#! /bin/bash
+#
+#  NaraeWiz CONFIG
+#
+#
+#HOST_OS=Windows
+#HOST_OS=Linux
+#ZIPALIGN=/bin/zipalign
+
+HOST_OS=Windows
