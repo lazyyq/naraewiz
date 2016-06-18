@@ -1,6 +1,8 @@
 #!/bin/bash
 # Automated NaraeWiz ROM maker for G930K
-
+#
+# Important! You Have to set your OS to CONFIG! Default: Windows
+#
 if [ ! -e $1/build.prop ]; then
 	echo "$(tput setaf 1)$(tput bold)Input /system directory path.$(tput sgr0)"
 	exit 1
@@ -9,6 +11,11 @@ if [ -e $1/framework/oat ]; then
 	echo "$(tput setaf 1)$(tput bold)ROM is not properly deodex'ed!$(tput sgr0)"
 	exit 1
 fi
+
+chmod 775 CONFIG
+cat CONFIG | while read file; do
+	export $file
+done
 
 SYSDIR=$1 # system dir
 PREBUILTDIR=$(realpath _Prebuilt)
@@ -91,8 +98,12 @@ ls -d $PREBUILTDIR/*/ | while read file; do cp -R $file/* ./; done
 #
 # Optimize framework : I need to find a zipalign binary that works on bash on windows first.
 #
-#ECHOINFO "Optimizing framework files"
-#find . -type f -name '*.jar' -maxdepth 1 | while read i; do 7z x $i -otest &>NUL; cd test; jar -cf0M $i *; zipalign -f 4 $i ../$i; cd ..; rm -r test; done
-#find . -type f -name '*.apk' -maxdepth 1 | while read i; do 7z x $i -otest &>NUL; cd test; 7z a -tzip $i * -mx0 &>NUL; zipalign -f 4 $i ../$i; cd ..; rm -r test; done
 
+if [$HOST_OS = "Linux"]
+then
+	ECHOINFO "Optimizing framework files"
+	find . -type f -name '*.jar' -maxdepth 1 | while read i; do 7z x $i -otest &>NUL; cd test; jar -cf0M $i *; zipalign -f 4 $i ../$i; cd ..; rm -r test; done
+	find . -type f -name '*.apk' -maxdepth 1 | while read i; do 7z x $i -otest &>NUL; cd test; 7z a -tzip $i * -mx0 &>NUL; zipalign -f 4 $i ../$i; cd ..; rm -r test; done
+
+fi
 ECHOINFO "DONE."
